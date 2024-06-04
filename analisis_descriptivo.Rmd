@@ -1,9 +1,9 @@
 ---
-title: "analisis_descriptivo"
+title: "Análisis Descriptivo"
 output: html_document
 ---
 
-# 3.1 Análisis Descriptivo
+# Análisis Descriptivo
 
 ```{r}
 # librerías necesarias para implementar las funciones
@@ -21,11 +21,23 @@ library(xtable)
 library(here)
 library(skimr) 
 library(kableExtra) 
+library(rcompanion)
+library(RCurl)
 ```
 
 ```{r}
 # importar base de datos 
-base_datos <- read_excel("/Users/sofiabocker/Desktop/universidad/UCR/Actuariales/Cuarto año/I Ciclo/Estadística Actuarial I/Proyecto/base de datos/base_datos_alcohol.xlsx")
+
+# Link de la base de datos en github
+url <- "https://raw.githubusercontent.com/sofiabocker/proyecto_ca_0303_g08/main/base_datos_alcohol.xlsx"
+
+# descargar el archivo 
+binary_data <- getBinaryURL(url)
+temp_file <- tempfile(fileext = ".xlsx")
+writeBin(binary_data, temp_file)
+
+# leer el archivo en R
+base_datos <- read_excel(temp_file)
 
 base_datos <- base_datos [, -32]
 base_datos <- base_datos [, -32]
@@ -100,40 +112,23 @@ base_datos_clean <- base_datos_clean %>%
   ))
 
 base_datos_clean$time_with_friends <- as.character(base_datos_clean$time_with_friends)
-
-```
-
-## Data
-
-```{r}
- head(base_datos_clean) # muestra las primeras seis observaciones
 ```
 
 ```{r}
-str <- str(base_datos_clean) # muestra la estructura de los datos
-
+# muestra la estructura de los datos
+str <- str(base_datos_clean) 
 ```
-```{r}
-# dimensiones de la base de datos
-dim(base_datos_clean)
-```
-
 
 ```{r}
 # resumen general de la base de datos
 
 summary(base_datos_clean)
-
 ```
+
 ```{r}
 # explora data
+
 skimr::skim(base_datos_clean) 
-
-```
-
-```{r}
-# resumen de la base de datos dado por escuela
-by(base_datos_clean, base_datos_clean$school, summary)
 ```
 
 ### Variables cuantitativas  
@@ -144,127 +139,12 @@ base_datos_num <- base_datos_clean %>% select_if(is.numeric)
 base_datos_num
 ```
 
-#### Rango Intercuartil
-
-```{r}
-# obtener el rango intercuartil de cada columna numérica
-
-rango_intercuantil <- lapply(base_datos_num, IQR)
-rango_intercuantil
-```
-
-#### Desviación Estándar
-
-```{r}
-# obtener la desviación estándar
-
-desviacion_estandar <- lapply(base_datos_num, sd)
-desviacion_estandar
-```
-
-#### Varianza
-
-```{r}
-# obtener la varianza
-
-varianza <- lapply(base_datos_num, var)
-varianza
-```
-
 #### Estadísticas más Específicas
 
 ```{r}
 # brinda estadísticas más específicas 
 estadisticas <- stat.desc(base_datos_num)
 estadisticas
-```
-
-#### Correlaciones y sus representaciones gráficas
-
-```{r}
-# obtener el coeficiente de correlación con la columna de Edad
-
-corr_edad <- lapply(base_datos_num, function(x) cor(x, base_datos_num$age))
-corr_edad
-```
-
-```{r}
-# convertir las correlaciones a un dataframe para mayor conveniencia
-corr_edad <- data.frame(
-  column_names = names(corr_edad),
-  correlation = unlist(corr_edad)
-)
-
-# representación gráfica
-ggplot(corr_edad, aes(x = column_names, y = correlation, fill = correlation)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Correlación con Edad", x = "Columnas", y = "Correlación") +
-  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0)
-```
-
-
-```{r}
-# obtener el coeficiente de correlación con la columna de ausencias
-
-corr_ausencias <- lapply(base_datos_num, function(x) cor(x, base_datos_num$school_absence))
-corr_ausencias
-```
-
-```{r}
-# convertir las correlaciones a un dataframe para mayor conveniencia
-corr_edad <- data.frame(
-  column_names = names(corr_ausencias),
-  correlation = unlist(corr_ausencias)
-)
-
-# representación gráfica
-ggplot(corr_edad, aes(x = column_names, y = correlation, fill = correlation)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Correlación con Ausencias", x = "Columnas", y = "Correlación") +
-  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0)
-```
-
-
-```{r}
-# obtener el coeficiente de correlación con la columna de notas primer semestre
-
-corr_notas_primer_sem <- lapply(base_datos_num, function(x) cor(x, base_datos_num$grade_1st_semester))
-corr_notas_primer_sem
-```
-
-```{r}
-# convertir las correlaciones a un dataframe para mayor conveniencia
-corr_edad <- data.frame(
-  column_names = names(corr_notas_primer_sem),
-  correlation = unlist(corr_notas_primer_sem)
-)
-
-# representación gráfica
-ggplot(corr_edad, aes(x = column_names, y = correlation, fill = correlation)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Correlación con Notas Primer Semestre", x = "Columnas", y = "Correlación") +
-  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0)
-```
-
-```{r}
-# obtener el coeficiente de correlación con la columna de notas segundo semestre
-
-corr_notas_segundo_sem <- lapply(base_datos_num, function(x) cor(x, base_datos_num$grade_2nd_semester))
-corr_notas_segundo_sem
-```
-
-```{r}
-# convertir las correlaciones a un dataframe para mayor conveniencia
-corr_edad <- data.frame(
-  column_names = names(corr_notas_segundo_sem),
-  correlation = unlist(corr_notas_segundo_sem)
-)
-
-# representación gráfica
-ggplot(corr_edad, aes(x = column_names, y = correlation, fill = correlation)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Correlación con Notas Segundo Semestre", x = "Columnas", y = "Correlación") +
-  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0)
 ```
 
 #### Histogramas
@@ -277,53 +157,6 @@ lapply(names(base_datos_num), function(col_name) {
   ggplot(data.frame(col), aes(x = col)) +
     geom_histogram(binwidth = 1, fill = "blue") +
     labs(title = col_name, x = col_name, y = "Frequencia")
-})
-
-```
-
-#### Box Plots
-
-```{r}
-# crear gráficos boxplots para cada columna cuantitativa
-
-lapply(names(base_datos_num), function(col_name) {
-  ggplot(base_datos_num, aes_string(x = col_name)) +
-    geom_boxplot(outlier.colour="black", outlier.shape=16,
-                 outlier.size=2, notch=FALSE)
-})
-```
-
-```{r}
-# Box Plot de la columna de edad y todas las otras columnas cuantitativas
-
-lapply(names(base_datos_num)[-which(names(base_datos_num) == "age")], function(col_name) {
-  boxplot(base_datos_num$age ~ base_datos_num[[col_name]], main = paste("Edad y", col_name))
-})
-
-
-```
-
-```{r}
-# Box Plot de la columna de ausencias y todas las otras columnas cuantitativas
-
-lapply(names(base_datos_num)[-which(names(base_datos_num) == "school_absence")], function(col_name) {
-  boxplot(base_datos_num$school_absence ~ base_datos_num[[col_name]], main = paste("Ausencia y", col_name))
-})
-```
-
-```{r}
-# Box Plot de la columna de nota primer semestre y todas las otras columnas cuantitativas
-
-lapply(names(base_datos_num)[-which(names(base_datos_num) == "grade_1st_semester")], function(col_name) {
-  boxplot(base_datos_num$grade_1st_semester ~ base_datos_num[[col_name]], main = paste("Nota Primer Semestre y", col_name))
-})
-```
-
-```{r}
-# Box Plot de la columna de nota segundo semestre y todas las otras columnas cuantitativas
-
-lapply(names(base_datos_num)[-which(names(base_datos_num) == "grade_2nd_semester")], function(col_name) {
-  boxplot(base_datos_num$grade_2nd_semester ~ base_datos_num[[col_name]], main = paste("Nota Segundo Semestre y", col_name))
 })
 
 ```
@@ -341,6 +174,8 @@ lapply(names(base_datos_num), function(col_name) {
 })
 
 ```
+
+#### Gráficos de Barra
 
 ```{r}
 # crear gráficos de barra para cada columna cuantitativa
@@ -362,21 +197,6 @@ base_datos_str <- base_datos_clean %>% select_if(is.character)
 base_datos_str
 ```
 
-```{r}
-
-count_df<- function(column) {
-  count_data <- base_datos_str %>% count(!!sym(column))
-  return(count_data)
-}
-
-countt <- lapply(names(base_datos_str), function(col) {
-  count_df(col)
-})
-
-print(countt)
-```
-
-
 #### Gráficos de barra
 
 ```{r}
@@ -396,103 +216,31 @@ lapply(names(base_datos_str), function(col_name) {
 #### Variables cualitativas y cuantitativas
 
 ```{r}
-# Opened polygons
+# Relaciona la nota del primer semestre con la cantidad de alcohol consumida entre semana
+
 ggplot(base_datos_clean, aes(x = grade_1st_semester, y = alcohol_weekdays, group = alcohol_weekdays)) + 
   geom_density_ridges()
 ```
 
 ```{r}
-# Opened polygons
+# Relaciona la nota del primer semestre con la cantidad de alcohol consumida en fin de semana
+
 ggplot(base_datos_clean, aes(x = grade_1st_semester, y = alcohol_weekends, group = alcohol_weekends)) + 
   geom_density_ridges()
 ```
 
 ```{r}
-# Opened polygons
+# Relaciona la nota del segundo semestre con la cantidad de alcohol consumida entre semana
+
 ggplot(base_datos_clean, aes(x = grade_2nd_semester, y = alcohol_weekdays, group = alcohol_weekdays)) + 
   geom_density_ridges()
 ```
 
-
 ```{r}
-# Opened polygons
+# Relaciona la nota del segundo semestre con la cantidad de alcohol consumida en fin de semana
+
 ggplot(base_datos_clean, aes(x = grade_2nd_semester, y = alcohol_weekends, group = alcohol_weekends)) + 
   geom_density_ridges()
-```
-
-
-```{r}
-ggplot(base_datos_clean, aes(x = alcohol_weekdays, y = grade_1st_semester)) +
-  geom_boxplot()
-```
-
-
-```{r}
-ggplot(base_datos_clean, aes(x = `grade_1st_semester`)) + 
-  geom_freqpoly(aes(color = `alcohol_weekdays`), binwidth = 1, linewidth = 0.75)
-```
-
-```{r}
-ggplot(base_datos_clean, aes(x = alcohol_weekends, y = grade_1st_semester)) +
-  geom_boxplot()
-```
-
-
-```{r}
-ggplot(base_datos_clean, aes(x = `grade_1st_semester`)) + 
-  geom_freqpoly(aes(color = `alcohol_weekends`), binwidth = 1, linewidth = 0.75)
-```
-
-```{r}
-ggplot(base_datos_clean, aes(x = alcohol_weekdays, y = grade_2nd_semester)) +
-  geom_boxplot()
-```
-
-
-```{r}
-ggplot(base_datos_clean, aes(x = `grade_2nd_semester`)) + 
-  geom_freqpoly(aes(color = `alcohol_weekdays`), binwidth = 1, linewidth = 0.75)
-```
-
-```{r}
-ggplot(base_datos_clean, aes(x = alcohol_weekends, y = grade_2nd_semester)) +
-  geom_boxplot()
-```
-
-```{r}
-ggplot(base_datos_clean, aes(x = `grade_1st_semester`)) + 
-  geom_freqpoly(aes(color = `alcohol_weekends`), binwidth = 1, linewidth = 0.75)
-```
-
-
-#### Dos variables categóricas
-
-```{r}
-lapply(names(base_datos_str), function(col_name) {
-  col <- base_datos_str[[col_name]]
-  ggplot(data.frame(col), aes(x = base_datos_str$alcohol_weekdays, y = col)) +
-    geom_count() +  
-    labs(title = col_name, x = "Alcohol_Weekdays", y = col_name)
-})
-```
-
-```{r}
-lapply(names(base_datos_str), function(col_name) {
-  col <- base_datos_str[[col_name]]
-  ggplot(data.frame(col), aes(x = base_datos_str$alcohol_weekends, y = col)) +
-    geom_count() +  
-    labs(title = col_name, x = "Alcohol_Weekends", y = col_name)
-})
-```
-
-```{r}
-base_datos_str |> 
-  count(alcohol_weekdays, gender)
-
-base_datos_str |> 
-  count(alcohol_weekdays, gender) |>  
-  ggplot(aes(x = alcohol_weekdays, y = gender)) +
-  geom_tile(aes(fill = n))
 ```
 
 ```{r}
@@ -529,22 +277,18 @@ heatmap_plots <- lapply(names(base_datos_str)[-which(names(base_datos_str) == "a
 print(heatmap_plots)
 ```
 
-
-
-
-
-# 3.2 Propuesta métodologica
+# Prototipo de Modelación
 
 ## Tablas de contingencia Alcohol entre semana
 
 ```{r}
 # Crear tablas de contingencia para cada columna cualitativa y la de cantidad de alcohol entre semana
+
 tablas_contingencias_1 <- lapply(base_datos_str, function(col) {
   table(col, base_datos_str$alcohol_weekdays)
 })
 
 print(tablas_contingencias_1)
-
 ```
 
 
@@ -566,15 +310,11 @@ lapply(seq_along(tablas_contingencias_1), function(i) {
 
 ```{r}
 # aplicar la prueba de independencia de chi-cuadrado a cada tabla de contingencia
+
 chi_cuadrado_1 <- lapply(tablas_contingencias_1, chisq.test)
 
 chi_cuadrado_1
-
 ```
-
-
-
-
 
 ## Tablas de contingencia Alcohol fin de semana
 
@@ -586,8 +326,6 @@ tablas_contingencias_2 <- lapply(base_datos_str, function(col) {
 
 print(tablas_contingencias_2)
 ```
-
-## Diagrama de mosaico
 
 ```{r}
 # crear una representación gráfica de las tablas de contingencia
@@ -610,3 +348,32 @@ chi_cuadrado_2 <- lapply(tablas_contingencias_2, chisq.test)
 
 chi_cuadrado_2
 ```
+
+```{r}
+# asegurarse que los datos sean factores
+
+base_datos_str[] <- lapply(base_datos_str, as.factor)
+
+# generar la V de Cramer para cada columna con alcohol_weekdays
+
+v_cramer_entre_semana <- sapply(base_datos_str, function(col) {
+  cramerV(base_datos_str$alcohol_weekdays, col, ci = FALSE, conf = 0.95, type = "perc", R = 1000, histogram = FALSE, digits = 4, bias.correct = FALSE, reportIncomplete = FALSE, verbose = FALSE, tolerance = 1e-16)
+})
+
+print(v_cramer_entre_semana)
+
+```
+
+```{r}
+# generar la V de Cramer para cada columna con alcohol_weekends
+
+v_cramer_fin_semana <- sapply(base_datos_str, function(col) {
+  cramerV(base_datos_str$alcohol_weekends, col, ci = FALSE, conf = 0.95, type = "perc", R = 1000, histogram = FALSE, digits = 4, bias.correct = FALSE, reportIncomplete = FALSE, verbose = FALSE, tolerance = 1e-16)
+})
+
+print(v_cramer_fin_semana)
+```
+
+
+
+
