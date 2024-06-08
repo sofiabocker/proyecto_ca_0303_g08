@@ -342,12 +342,18 @@ lapply(seq_along(tablas_contingencias_2), function(i) {
 
 ## Prueba Chi-Cuadrado
 
+Se escogió el nivel estándar de significancia donde alpha = 5, esto quiere decir que si el p-valor es menor a 5%, entonces, la probabilidad de que esas dos variables sean independientes es muy baja, por lo que se rechaza H_0.
+
 ```{r}
 # aplicar la prueba de independencia de chi-cuadrado a cada tabla de contingencia
 chi_cuadrado_2 <- lapply(tablas_contingencias_2, chisq.test)
 
 chi_cuadrado_2
 ```
+
+### V de Cramer
+
+Este modelo permite responder parcialmente o totalmente la pregunta de investigación debido a que brinda información sobre qué factores poseen una mayor influencia en el consumo de alcohol en estudiantes adolescentes. Para poder interpretar los resultados, se puede observar el output que se generó al comparar las columnas alcohol_weekday y alcohol_weekend con el resto de las variables
 
 ```{r}
 # asegurarse que los datos sean factores
