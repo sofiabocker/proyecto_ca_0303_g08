@@ -218,29 +218,58 @@ lapply(names(base_datos_str), function(col_name) {
 ```{r}
 # Relaciona la nota del primer semestre con la cantidad de alcohol consumida entre semana
 
+# crear el gráfico con fondo blanco y color azul oscuro para las densidades
 ggplot(base_datos_clean, aes(x = grade_1st_semester, y = alcohol_weekdays, group = alcohol_weekdays)) + 
-  geom_density_ridges()
+  geom_density_ridges(fill = "darkblue", color = "white") +
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major = element_line(color = "grey80"),
+    panel.grid.minor = element_line(color = "grey90")
+  )
 ```
 
 ```{r}
 # Relaciona la nota del primer semestre con la cantidad de alcohol consumida en fin de semana
 
+# crear el gráfico con fondo blanco y color azul oscuro para las densidades
 ggplot(base_datos_clean, aes(x = grade_1st_semester, y = alcohol_weekends, group = alcohol_weekends)) + 
-  geom_density_ridges()
+  geom_density_ridges(fill = "darkblue", color = "white") +
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.grid.major = element_line(color = "grey80"),
+    panel.grid.minor = element_line(color = "grey90")
+  )
 ```
 
 ```{r}
 # Relaciona la nota del segundo semestre con la cantidad de alcohol consumida entre semana
 
 ggplot(base_datos_clean, aes(x = grade_2nd_semester, y = alcohol_weekdays, group = alcohol_weekdays)) + 
-  geom_density_ridges()
+  geom_density_ridges(fill = "darkblue", color = "white") +
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.grid.major = element_line(color = "grey80"),
+    panel.grid.minor = element_line(color = "grey90")
+)
 ```
 
 ```{r}
 # Relaciona la nota del segundo semestre con la cantidad de alcohol consumida en fin de semana
 
 ggplot(base_datos_clean, aes(x = grade_2nd_semester, y = alcohol_weekends, group = alcohol_weekends)) + 
-  geom_density_ridges()
+  geom_density_ridges(fill = "darkblue", color = "white") +
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.grid.major = element_line(color = "grey80"),
+    panel.grid.minor = element_line(color = "grey90")
+)
 ```
 
 ```{r}
@@ -249,7 +278,7 @@ create_heatmap <- function(col_name) {
   count_data <- base_datos_str %>% count(alcohol_weekdays, !!sym(col_name))
   ggplot(count_data, aes(x = alcohol_weekdays, y = !!sym(col_name))) +
     geom_tile(aes(fill = n), color = "white") +
-    scale_fill_gradient(low = "white", high = "blue") +
+    scale_fill_gradient(low = "white", high = "darkblue") +
     labs(title = paste("Comparación de alcohol entre semana con", col_name),
          x = "Alcohol entre semana", y = col_name)
 }
@@ -266,7 +295,7 @@ create_heatmap <- function(col_name) {
   count_data <- base_datos_str %>% count(alcohol_weekends, !!sym(col_name))
   ggplot(count_data, aes(x = alcohol_weekends, y = !!sym(col_name))) +
     geom_tile(aes(fill = n), color = "white") +
-    scale_fill_gradient(low = "white", high = "blue") +
+    scale_fill_gradient(low = "white", high = "darkblue") +
     labs(title = paste("Comparación de alcohol en fin de semana con", col_name),
          x = "Alcohol en fin de semana", y = col_name)
 }
